@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+// Student Number: S10275515
+// Student Name: Nur Tiara Nasha
+// Partner Name: Joelle
 namespace PRG2Assignment
 {
     class Customer
