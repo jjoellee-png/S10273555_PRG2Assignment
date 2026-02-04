@@ -18,8 +18,8 @@ namespace PRG2Assignment
         }
         public Customer(string eAdd, string custName)
         {
-            EmailAddress = eAdd;
             CustomerName = custName;
+            EmailAddress = eAdd;
         }
 
         private List<Order> orders = new List<Order>();
