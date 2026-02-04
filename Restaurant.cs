@@ -17,6 +17,7 @@ namespace PRG2Assignment
 
         public List<Menu> Menus { get; set; }
         public List<SpecialOffer> Offers { get; set; }
+        public Queue<Order> orders = new Queue<Order>();
 
         public Restaurant()
         {
@@ -35,7 +36,7 @@ namespace PRG2Assignment
 
         public void DisplayOrders()
         {
-            // will be implemented later
+            
         }
 
         public void DisplaySpecialOffers()
