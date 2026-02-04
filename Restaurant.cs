@@ -9,50 +9,65 @@ using System.Threading.Tasks;
 // Partner Name: Joelle
 namespace PRG2Assignment
 {
-    class Restaurant 
+    class Restaurant
     {
         public string RestaurantId { get; set; }
         public string RestaurantName { get; set; }
         public string RestaurantEmail { get; set; }
 
-        private List<Menu> menu = new List<Menu>();
-        private List<SpecialOffer> offers = new List<SpecialOffer>();
+        public List<Menu> Menus { get; set; }
+        public List<SpecialOffer> Offers { get; set; }
+
         public Restaurant()
         {
-
+            Menus = new List<Menu>();
+            Offers = new List<SpecialOffer>();
         }
+
         public Restaurant(string rId, string rName, string rEmail)
         {
             RestaurantId = rId;
             RestaurantName = rName;
             RestaurantEmail = rEmail;
+            Menus = new List<Menu>();
+            Offers = new List<SpecialOffer>();
         }
 
         public void DisplayOrders()
         {
-
+            // will be implemented later
         }
+
         public void DisplaySpecialOffers()
         {
-            foreach (var offer in offers)
-                Console.WriteLine(offer.ToString());
+            foreach (SpecialOffer offer in Offers)
+            {
+                Console.WriteLine(offer);
+            }
         }
+
         public void DisplayMenu()
         {
-            foreach (var menu in menu)
-                menu.DisplayFoodItems(); //from menu 
+            foreach (Menu m in Menus)
+            {
+                m.DisplayFoodItems();
+            }
         }
-        public void AddMenu(Menu menuItem)
+
+        public void AddMenu(Menu menu)
         {
-            menu.Add(menuItem);
+            Menus.Add(menu);
         }
-        public bool RemoveMenu(Menu menuItem)
+
+        public bool RemoveMenu(Menu menu)
         {
-            return menu.Remove(menuItem);
+            return Menus.Remove(menu);
         }
+
         public override string ToString()
         {
             return $"{RestaurantName} ({RestaurantId}) - {RestaurantEmail}";
         }
     }
 }
+
