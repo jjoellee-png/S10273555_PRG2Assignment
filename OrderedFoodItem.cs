@@ -17,10 +17,10 @@ namespace PRG2Assignment
 
         // Correct constructor
         public OrderedFoodItem(string itemName, string itemDesc, double itemPrice, string customise, int qty)
-            : base(itemName, itemDesc, itemPrice, customise) // pass actual values to FoodItem
+            : base(itemName, itemDesc, itemPrice, customise) // pass values to FoodItem
         {
             QtyOrdered = qty;
-            SubTotal = QtyOrdered * ItemPrice; // calculate subtotal immediately
+            SubTotal = QtyOrdered * ItemPrice; // calculate subtotal 
         }
 
         public double CalculateSubtotal()

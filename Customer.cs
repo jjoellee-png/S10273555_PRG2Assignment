@@ -12,32 +12,36 @@ namespace PRG2Assignment
     {
         public string EmailAddress { get; set; }
         public string CustomerName { get; set; }
+        public List<Order> Orders { get; set; }
+
         public Customer()
         {
-
+            Orders = new List<Order>();
         }
+
         public Customer(string eAdd, string custName)
         {
             EmailAddress = eAdd;
             CustomerName = custName;
+            Orders = new List<Order>();
         }
-
-        private List<Order> orders = new List<Order>();
 
         public void AddOrder(Order order)
         {
-            orders.Add(order);
+            Orders.Add(order);
         }
 
         public bool RemoveOrder(Order order)
         {
-            return orders.Remove(order);
+            return Orders.Remove(order);
         }
 
         public void DisplayAllOrders()
         {
-            foreach (var order in orders)
-                Console.WriteLine(order.ToString());
+            foreach (var order in Orders)
+            {
+                Console.WriteLine(order);
+            }
         }
 
         public override string ToString()
@@ -45,4 +49,5 @@ namespace PRG2Assignment
             return $"{CustomerName} ({EmailAddress})";
         }
     }
+
 }
