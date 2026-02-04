@@ -15,8 +15,9 @@ namespace PRG2Assignment
         public string RestaurantName { get; set; }
         public string RestaurantEmail { get; set; }
 
-        private List<Menu> menu = new List<Menu>();
-        private List<SpecialOffer> offers = new List<SpecialOffer>();
+        public List<Menu> menu = new List<Menu>();
+        public List<SpecialOffer> offers = new List<SpecialOffer>();
+        public Queue<Order> orders = new Queue<Order>();
         public Restaurant()
         {
 
