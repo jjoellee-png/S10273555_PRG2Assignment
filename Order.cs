@@ -13,6 +13,7 @@ namespace PRG2Assignment
         public int OrderId { get; set; }
         public DateTime OrderDateTime { get; set; }
         public double OrderTotal { get; set; }
+        private double orderTotal;
         public string OrderStatus { get; set; }
         public DateTime DeliveryDateTime { get; set; }
         public string DeliveryAddress { get; set; }
@@ -20,6 +21,26 @@ namespace PRG2Assignment
         public bool OrderPaid { get; set; }
 
         private List<OrderedFoodItem> orderedFoodItems = new List<OrderedFoodItem>();
+
+        public Order(int id)
+        {
+            OrderId = id;
+            OrderDateTime = DateTime.Now;
+            OrderStatus = "Pending";
+            OrderPaid = false;
+        }
+        public Order(int orderId, DateTime orderDateTime, string status,
+             string deliveryAddress, string paymentMethod, double orderTotal)
+        {
+            OrderId = orderId;
+            OrderDateTime = orderDateTime;
+            OrderStatus = status;
+            DeliveryAddress = deliveryAddress;
+            OrderPaymentMethod = paymentMethod;
+            OrderPaid = false;
+            OrderedFoodItems = new List<OrderedFoodItem>();
+            OrderTotal = orderTotal;
+        }
 
         public double CalculateOrderTotal()
         {
