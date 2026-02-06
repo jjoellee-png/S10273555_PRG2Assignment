@@ -120,3 +120,33 @@ void LoadOrders()
         }
     }
 }
+
+// Joelle Heng - Feature 3
+
+void ListRestaurantAndMenuItems()
+{
+    Console.WriteLine("All Restaurants and Menu Items");
+    Console.WriteLine("==============================");
+    if (restaurants.Count == 0)
+    {
+        Console.WriteLine("No restaurants found.");
+        return;
+    }
+
+    foreach (Restaurant r in restaurants)
+    {
+        Console.WriteLine($"Restaurant: {r.RestaurantName} ({r.RestaurantId})");
+    }
+    if (fooditem == null || fooditem.Count == 0)
+    {
+        Console.WriteLine(" - No food items available.");
+    }
+    else
+    {
+        foreach (FoodItem fi in fooditem)
+        {
+            Console.WriteLine($" - {fi.ItemName}: {fi.ItemDesc} - ${fi.ItemPrice:0.00}");
+        }
+    }
+    Console.WriteLine();
+}
