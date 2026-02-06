@@ -1,18 +1,22 @@
-<<<<<<< HEAD
+
 ﻿using PRG2Assignment;
 using S10273555_PRG2Assignment;
-using System.Globalization;
 
 // Nur Tiara Nasha - Feature 1
+
+﻿// Nur Tiara Nasha 
+using PRG2Assignment;
+using S10273555_PRG2Assignment;
+
+
 List<Restaurant> restaurants = new List<Restaurant>();
 
-using (StreamReader sr = new StreamReader("restaurants.csv"))
+// load restaurants
+void LoadRestaurants(string filePath)
 {
-    string line;
-    sr.ReadLine();
-
-    while ((line = sr.ReadLine()) != null)
+    using (StreamReader sr = new StreamReader(filePath))
     {
+
         string[] data = line.Split(",");
 
         string id = data[0];
@@ -70,40 +74,7 @@ using (StreamReader sr = new StreamReader("fooditems.csv"))
         {
             r.Menus[0].AddFoodItem(foodItem);
 
-        }
-    }
-}
 
-// Joelle Heng - Feature 2
-List<Customer> customersList = new List<Customer>();
-List<Order> ordersList = new List<Order>();
-void LoadCustomers()
-{
-    using (StreamReader sr = new StreamReader("customer.csv"))
-    {
-        string header = sr.ReadLine(); // reads the first line, skips the header
-        string? line; // allows the line to hold any null value (if any)
-
-        while ((line = sr.ReadLine()) != null)
-        {
-            string[] parts = line.Split(',');
-            string name = parts[0];
-            string email = parts[1];
-
-            Customer customer = new Customer(name, email);
-            customersList.Add(customer);
-=======
-﻿// Nur Tiara Nasha 
-using PRG2Assignment;
-using S10273555_PRG2Assignment;
-
-List<Restaurant> restaurants = new List<Restaurant>();
-
-// load restaurants
-void LoadRestaurants(string filePath)
-{
-    using (StreamReader sr = new StreamReader(filePath))
-    {
         sr.ReadLine(); // skip header
         string line;
         while ((line = sr.ReadLine()) != null)
@@ -113,92 +84,11 @@ void LoadRestaurants(string filePath)
             Restaurant r = new Restaurant(data[0], data[1], data[2]);
             r.AddMenu(new Menu("M001", "Main Menu")); // create default menu
             restaurants.Add(r);
->>>>>>> 9fd0981ee77b6da10d178a7246b6dd65472333dc
+
         }
     }
 }
 
-<<<<<<< HEAD
-void LoadOrders()
-{
-    using (StreamReader sr = new StreamReader("orders.csv"))
-    {
-        string header = sr.ReadLine();
-        string? line;
-
-        while ((line = sr.ReadLine()) != null)
-        {
-            string[] firstParts = line.Split('"');
-
-            string[] parts = firstParts[0].Split(",");
-
-            int orderId = Convert.ToInt32(parts[0]);
-            string custEmail = parts[1];
-            string restaurantId = parts[2];
-
-            string deliveryDate = parts[3];
-            string deliveryTime = parts[4];
-            string deliveryAddress = parts[5];
-
-            var createdDateTimeString = parts[6].Split(" ");
-            string createdDateString = createdDateTimeString[0];
-            string createdTimeString = createdDateTimeString[1];
-
-            double totalAmount = Convert.ToDouble(parts[7]);
-            string status = parts[8];
-
-            // CultureInfo.InvariantCulture helps to avoid confusion with different formats.
-            DateTime deliveryDateTime = DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-            DateTime createdDateTime = DateTime.ParseExact(createdDateString + " " + createdTimeString, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-
-            Order order = new Order(orderId);
-            order.DeliveryDateTime = deliveryDateTime;
-            order.DeliveryAddress = deliveryAddress;
-            order.OrderDateTime = createdDateTime;
-            order.OrderTotal = totalAmount;
-            order.OrderStatus = status;
-
-            // here - added foreach and addorderedfooditem
-            var items = firstParts[1].Split("|");
-
-            foreach (string item in items)
-            {
-                string[] itemsPart = item.Split(","); // changed items[0] to item so that item wont repeat -Mahima
-                string itemName = itemsPart[0].Trim();
-                int qty = Convert.ToInt32(itemsPart[1].Trim()); //added trim()
-
-                foreach (var foodItem in fooditem)
-                {
-                    if (foodItem.ItemName == itemName)
-                    {
-                        OrderedFoodItem orderedFoodItem = new OrderedFoodItem(itemName, foodItem.ItemDesc, foodItem.ItemPrice, "", qty);
-                        order.AddOrderedFoodItem(orderedFoodItem);
-                    }
-                }
-            }
-
-            ordersList.Add(order);
-
-            foreach (Customer customer in customersList)
-            {
-                if (customer.EmailAddress == custEmail)
-                {
-                    customer.AddOrder(order);
-                    break;
-                }
-            }
-
-            foreach (Restaurant restaurant in restaurants)
-            {
-                if (restaurant.RestaurantId == restaurantId)
-                {
-                    restaurant.orders.Enqueue(order);
-                }
-            }
-        }
-    }
-}
-=======
 // load food items and assign them
 void LoadFoodItems(string filePath)
 {
@@ -238,9 +128,86 @@ void DisplayAllRestaurants()
     }
 }
 
+
+// Joelle Heng - Feature 2
+List<Customer> customersList = new List<Customer>();
+List<Order> ordersList = new List<Order>();
+void LoadCustomers()
+{
+    using (StreamReader sr = new StreamReader("customer.csv"))
+    {
+        string header = sr.ReadLine(); // reads the first line, skips the header
+        string? line; // allows the line to hold any null value (if any)
+
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] parts = line.Split(',');
+            string name = parts[0];
+            string email = parts[1];
+
+            Customer customer = new Customer(name, email);
+            customersList.Add(customer);
+
+void LoadOrders()
+{
+    using (StreamReader sr = new StreamReader("orders - Copy.csv"))
+    {
+        string header = sr.ReadLine();
+        string? line;
+
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] parts = line.Split(',');
+            string orderid = parts[0];
+            string custem = parts[1];
+            string restid = parts[2];
+            string dd = parts[3];
+            string dt = parts[4];
+            string da = parts[5];
+            string cdt = parts[6];
+            double totalamt = double.Parse(parts[7]);
+            string status = parts[8];
+            string items = parts[9];
+
+            Order order = new Order(orderid, custem, restid, dd, dt, da, cdt, totalamt, status, items);
+            ordersList.Add(order);
+        }
+    }
+}
+
+// Joelle Heng - Feature 3
+
+void ListRestaurantAndMenuItems()
+{
+    Console.WriteLine("All Restaurants and Menu Items");
+    Console.WriteLine("==============================");
+    if (restaurants.Count == 0)
+    {
+        Console.WriteLine("No restaurants found.");
+        return;
+    }
+
+    foreach (Restaurant r in restaurants)
+    {
+        Console.WriteLine($"Restaurant: {r.RestaurantName} ({r.RestaurantId})");
+    }
+    if (fooditem == null || fooditem.Count == 0)
+    {
+        Console.WriteLine(" - No food items available.");
+    }
+    else
+    {
+        foreach (FoodItem fi in fooditem)
+        {
+            Console.WriteLine($" - {fi.ItemName}: {fi.ItemDesc} - ${fi.ItemPrice:F2}");
+        }
+    }
+    Console.WriteLine();
+}
+
 // ----------------------------
 // call the methods
 LoadRestaurants("restaurants.csv");
 LoadFoodItems("fooditems.csv");
 DisplayAllRestaurants();
->>>>>>> 9fd0981ee77b6da10d178a7246b6dd65472333dc
+
