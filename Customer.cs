@@ -21,9 +21,9 @@ namespace PRG2Assignment
 
         public Customer(string eAdd, string custName)
         {
+            CustomerName = custName;
             EmailAddress = eAdd;
             CustomerName = custName;
-            Orders = new List<Order>();
         }
 
         public void AddOrder(Order order)
