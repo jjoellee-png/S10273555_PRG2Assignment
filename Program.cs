@@ -1,16 +1,22 @@
+<<<<<<< HEAD
 ﻿using PRG2Assignment;
 using S10273555_PRG2Assignment;
 
 // Nur Tiara Nasha - Feature 1
+=======
+﻿// Nur Tiara Nasha 
+using PRG2Assignment;
+using S10273555_PRG2Assignment;
+
+>>>>>>> origin/master
 List<Restaurant> restaurants = new List<Restaurant>();
 
-using (StreamReader sr = new StreamReader("restaurants.csv"))
+// load restaurants
+void LoadRestaurants(string filePath)
 {
-    string line;
-    sr.ReadLine();
-
-    while ((line = sr.ReadLine()) != null)
+    using (StreamReader sr = new StreamReader(filePath))
     {
+<<<<<<< HEAD
         string[] data = line.Split(",");
 
         string id = data[0];
@@ -68,10 +74,22 @@ using (StreamReader sr = new StreamReader("fooditems.csv"))
         {
             r.Menus[0].AddFoodItem(foodItem);
 
+=======
+        sr.ReadLine(); // skip header
+        string line;
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] data = line.Split(",");
+
+            Restaurant r = new Restaurant(data[0], data[1], data[2]);
+            r.AddMenu(new Menu("M001", "Main Menu")); // create default menu
+            restaurants.Add(r);
+>>>>>>> origin/master
         }
     }
 }
 
+<<<<<<< HEAD
 // Joelle Heng - Feature 2
 List<Customer> customersList = new List<Customer>();
 List<Order> ordersList = new List<Order>();
@@ -90,10 +108,37 @@ void LoadCustomers()
 
             Customer customer = new Customer(name, email);
             customersList.Add(customer);
+=======
+// load food items and assign them
+void LoadFoodItems(string filePath)
+{
+    using (StreamReader sr = new StreamReader(filePath))
+    {
+        sr.ReadLine(); // skip header
+        string line;
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] data = line.Split(",");
+
+            string restaurantId = data[0];
+            string itemName = data[1];
+            string itemDesc = data[2];
+            double itemPrice = double.Parse(data[3]);
+
+            FoodItem foodItem = new FoodItem(itemName, itemDesc, itemPrice, "");
+
+            // assign to restaurant menu
+            Restaurant r = restaurants.Find(res => res.RestaurantId == restaurantId);
+            if (r != null)
+            {
+                r.Menus[0].AddFoodItem(foodItem);
+            }
+>>>>>>> origin/master
         }
     }
 }
 
+<<<<<<< HEAD
 void LoadOrders()
 {
     using (StreamReader sr = new StreamReader("orders - Copy.csv"))
@@ -150,3 +195,21 @@ void ListRestaurantAndMenuItems()
     }
     Console.WriteLine();
 }
+=======
+// display all restaurants and menus
+void DisplayAllRestaurants()
+{
+    foreach (Restaurant r in restaurants)
+    {
+        Console.WriteLine(r);
+        r.DisplayMenu();
+        Console.WriteLine();
+    }
+}
+
+// ----------------------------
+// call the methods
+LoadRestaurants("restaurants.csv");
+LoadFoodItems("fooditems.csv");
+DisplayAllRestaurants();
+>>>>>>> origin/master
