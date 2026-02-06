@@ -20,7 +20,19 @@ namespace PRG2Assignment
         public string OrderPaymentMethod { get; set; }
         public bool OrderPaid { get; set; }
 
-        private List<OrderedFoodItem> orderedFoodItems = new List<OrderedFoodItem>();
+        public List<OrderedFoodItem> OrderedFoodItems { get; set; }
+
+        public Order(int orderId, DateTime orderDateTime, string status,
+             string deliveryAddress, string paymentMethod)
+        {
+            OrderId = orderId;
+            OrderDateTime = orderDateTime;
+            OrderStatus = status;
+            DeliveryAddress = deliveryAddress;
+            OrderPaymentMethod = paymentMethod;
+            OrderPaid = false;
+            OrderedFoodItems = new List<OrderedFoodItem>();
+        }
 
         public Order(int id)
         {
@@ -45,25 +57,31 @@ namespace PRG2Assignment
         public double CalculateOrderTotal()
         {
             OrderTotal = 0;
-            foreach (var item in orderedFoodItems)
+
+            foreach (OrderedFoodItem item in OrderedFoodItems)
+            {
                 OrderTotal += item.CalculateSubtotal();
+            }
+
             return OrderTotal;
         }
 
         public void AddOrderedFoodItem(OrderedFoodItem item)
         {
-            orderedFoodItems.Add(item);
+            OrderedFoodItems.Add(item);
         }
 
         public bool RemoveOrderedFoodItem(OrderedFoodItem item)
         {
-            return orderedFoodItems.Remove(item);
+            return OrderedFoodItems.Remove(item);
         }
 
         public void DisplayOrderedFoodItems()
         {
-            foreach (var item in orderedFoodItems)
-                Console.WriteLine(item.ToString());
+            foreach (OrderedFoodItem item in OrderedFoodItems)
+            {
+                Console.WriteLine(item);
+            }
         }
 
         public override string ToString()
