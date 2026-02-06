@@ -1,14 +1,14 @@
-<<<<<<< HEAD
+
 ﻿using PRG2Assignment;
 using S10273555_PRG2Assignment;
 
 // Nur Tiara Nasha - Feature 1
-=======
+
 ﻿// Nur Tiara Nasha 
 using PRG2Assignment;
 using S10273555_PRG2Assignment;
 
->>>>>>> origin/master
+
 List<Restaurant> restaurants = new List<Restaurant>();
 
 // load restaurants
@@ -16,7 +16,7 @@ void LoadRestaurants(string filePath)
 {
     using (StreamReader sr = new StreamReader(filePath))
     {
-<<<<<<< HEAD
+
         string[] data = line.Split(",");
 
         string id = data[0];
@@ -74,7 +74,7 @@ using (StreamReader sr = new StreamReader("fooditems.csv"))
         {
             r.Menus[0].AddFoodItem(foodItem);
 
-=======
+
         sr.ReadLine(); // skip header
         string line;
         while ((line = sr.ReadLine()) != null)
@@ -84,31 +84,11 @@ using (StreamReader sr = new StreamReader("fooditems.csv"))
             Restaurant r = new Restaurant(data[0], data[1], data[2]);
             r.AddMenu(new Menu("M001", "Main Menu")); // create default menu
             restaurants.Add(r);
->>>>>>> origin/master
+
         }
     }
 }
 
-<<<<<<< HEAD
-// Joelle Heng - Feature 2
-List<Customer> customersList = new List<Customer>();
-List<Order> ordersList = new List<Order>();
-void LoadCustomers()
-{
-    using (StreamReader sr = new StreamReader("customer.csv"))
-    {
-        string header = sr.ReadLine(); // reads the first line, skips the header
-        string? line; // allows the line to hold any null value (if any)
-
-        while ((line = sr.ReadLine()) != null)
-        {
-            string[] parts = line.Split(',');
-            string name = parts[0];
-            string email = parts[1];
-
-            Customer customer = new Customer(name, email);
-            customersList.Add(customer);
-=======
 // load food items and assign them
 void LoadFoodItems(string filePath)
 {
@@ -133,12 +113,41 @@ void LoadFoodItems(string filePath)
             {
                 r.Menus[0].AddFoodItem(foodItem);
             }
->>>>>>> origin/master
         }
     }
 }
 
-<<<<<<< HEAD
+// display all restaurants and menus
+void DisplayAllRestaurants()
+{
+    foreach (Restaurant r in restaurants)
+    {
+        Console.WriteLine(r);
+        r.DisplayMenu();
+        Console.WriteLine();
+    }
+}
+
+
+// Joelle Heng - Feature 2
+List<Customer> customersList = new List<Customer>();
+List<Order> ordersList = new List<Order>();
+void LoadCustomers()
+{
+    using (StreamReader sr = new StreamReader("customer.csv"))
+    {
+        string header = sr.ReadLine(); // reads the first line, skips the header
+        string? line; // allows the line to hold any null value (if any)
+
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] parts = line.Split(',');
+            string name = parts[0];
+            string email = parts[1];
+
+            Customer customer = new Customer(name, email);
+            customersList.Add(customer);
+
 void LoadOrders()
 {
     using (StreamReader sr = new StreamReader("orders - Copy.csv"))
@@ -190,21 +199,10 @@ void ListRestaurantAndMenuItems()
     {
         foreach (FoodItem fi in fooditem)
         {
-            Console.WriteLine($" - {fi.ItemName}: {fi.ItemDesc} - ${fi.ItemPrice:0.00}");
+            Console.WriteLine($" - {fi.ItemName}: {fi.ItemDesc} - ${fi.ItemPrice:F2}");
         }
     }
     Console.WriteLine();
-}
-=======
-// display all restaurants and menus
-void DisplayAllRestaurants()
-{
-    foreach (Restaurant r in restaurants)
-    {
-        Console.WriteLine(r);
-        r.DisplayMenu();
-        Console.WriteLine();
-    }
 }
 
 // ----------------------------
@@ -212,4 +210,4 @@ void DisplayAllRestaurants()
 LoadRestaurants("restaurants.csv");
 LoadFoodItems("fooditems.csv");
 DisplayAllRestaurants();
->>>>>>> origin/master
+
