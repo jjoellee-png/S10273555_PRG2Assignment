@@ -20,7 +20,6 @@ namespace PRG2Assignment
         public Queue<Order> orders = new Queue<Order>();
         public List<Menu> Menus { get; set; }
         public List<SpecialOffer> Offers { get; set; }
-        public Queue<Order> orders = new Queue<Order>();
         public Restaurant()
         {
             Menus = new List<Menu>();
