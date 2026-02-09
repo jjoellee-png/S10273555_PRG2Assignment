@@ -465,6 +465,101 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         double total = itemsTotal + deliveryFee;
 
         Console.WriteLine($"Order Total: ${itemsTotal:0.00} + ${deliveryFee:0.00} (delivery) = ${total:0.00}");
-    }
 
+        Console.Write("Proceed to payment? [Y/N]: ");
+        string payChoice = Console.ReadLine();
+        if (payChoice == null) payChoice = "";
+        payChoice = payChoice.Trim().ToUpper();
+
+        if (payChoice != "Y")
+        {
+            Console.WriteLine("Payment not made. Exiting feature.");
+            return;
+        }
+
+        string paymentMethod = "";
+        while (true)
+        {
+            Console.WriteLine("Payment method:");
+            Console.Write("[CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
+            paymentMethod = Console.ReadLine();
+            if (paymentMethod == null) paymentMethod = "";
+            paymentMethod = paymentMethod.Trim().ToUpper();
+
+            if (paymentMethod == "CC" || paymentMethod == "PP" || paymentMethod == "CD")
+                break;
+
+            Console.WriteLine("Invalid payment method. Try again.");
+        }
+
+        int maxId = 1000;
+        foreach (Customer c in customers)
+        {
+            foreach (Order o in c.Orders)
+            {
+                if (o.OrderId > maxId)
+                    maxId = o.OrderId;
+            }
+        }
+        int newOrderId = maxId + 1;
+
+        Order newOrder = new Order(newOrderId);
+
+        newOrder.CustomerEmail = cust.EmailAddress; 
+        newOrder.RestaurantId = rest.RestaurantId;
+        newOrder.DeliveryDateTime = deliveryDateTime;
+        newOrder.DeliveryAddress = deliveryAddress;
+        newOrder.OrderedFoodItems = orderedItems;
+        newOrder.SpecialRequest = specialRequest;  
+        newOrder.OrderPaymentMethod = paymentMethod;
+        newOrder.OrderStatus = "Pending";
+        newOrder.TotalAmount = total;
+
+        rest.OrderQueue.Enqueue(newOrder);
+        cust.Orders.Add(newOrder);
+
+        string itemsPart = "";
+        for (int i = 0; i < orderedItems.Count; i++)
+        {
+            itemsPart += orderedItems[i].ItemName + "|" + orderedItems[i].QtyOrdered;
+            if (i < orderedItems.Count - 1) itemsPart += ";";
+        }
+
+        // Escape commas by quoting if needed
+        string safeAddress = deliveryAddress;
+        if (safeAddress.Contains(",") || safeAddress.Contains("\""))
+        {
+            safeAddress = safeAddress.Replace("\"", "\"\"");
+            safeAddress = "\"" + safeAddress + "\"";
+        }
+
+        string safeRequest = specialRequest;
+        if (safeRequest.Contains(",") || safeRequest.Contains("\""))
+        {
+            safeRequest = safeRequest.Replace("\"", "\"\"");
+            safeRequest = "\"" + safeRequest + "\"";
+        }
+
+        string line =
+            newOrderId + "," +
+            cust.EmailAddress + "," +
+            rest.RestaurantId + "," +
+            deliveryDateTime.ToString("dd/MM/yyyy HH:mm") + "," +
+            safeAddress + "," +
+            itemsTotal.ToString("0.00") + "," +
+            deliveryFee.ToString("0.00") + "," +
+            total.ToString("0.00") + "," +
+            paymentMethod + "," +
+            "Pending" + "," +
+            safeRequest + "," +
+            itemsPart;
+
+        using (StreamWriter sw = new StreamWriter(ordersCsvPath, true))
+        {
+            sw.WriteLine(line);
+        }
+
+        // 12) Confirmation
+        Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
+    }
 }
