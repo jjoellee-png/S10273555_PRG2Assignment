@@ -45,6 +45,7 @@ Restaurant r14 = new Restaurant("R014", "Soup Shack", "soupshack@email.com");
 Restaurant r15 = new Restaurant("R015", "Donut Delight", "donutdelight@email.com");
 
 //load fooditems.csv
+//Nur Tiara Nasha - Feature 1
 List<FoodItem> fooditem = new List<FoodItem>();
 
 using (StreamReader sr = new StreamReader("fooditems.csv"))
