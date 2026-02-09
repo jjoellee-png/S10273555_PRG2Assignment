@@ -30,8 +30,8 @@ namespace S10273555_PRG2Assignment
         private double itemPrice;
         public double ItemPrice
         {
-            get { return ItemPrice; }
-            set { ItemPrice = value; }
+            get { return itemPrice; }
+            set { itemPrice = value; }
         }
 
         private string customise;

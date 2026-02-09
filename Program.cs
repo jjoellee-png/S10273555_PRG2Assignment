@@ -4,78 +4,136 @@ using S10273555_PRG2Assignment;
 using System.ComponentModel.Design;
 using System.Globalization;
 
+// main option code
+LoadRestaurant();
+LoadFoodItem();
+LoadCustomers();
+LoadOrders();
+
+Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
+Console.WriteLine($"{restaurants.Count} restaurants loaded!");  // - Tiara
+Console.WriteLine($"{fooditem.Count} food items loaded!"); // - Tiara
+
+while (true)
+{
+    Console.WriteLine("\n===== Gruberoo Food Delivery System =====");
+    Console.WriteLine("1. List all restaurants and menu items");
+    Console.WriteLine("2. List all orders");
+    Console.WriteLine("3. Create a new order");
+    Console.WriteLine("4. Process an order");
+    Console.WriteLine("5. Modify an existing order");
+    Console.WriteLine("6. Delete an existing order");
+    Console.WriteLine("0. Exit");
+    Console.Write("Enter your choice: ");
+
+    string input = Console.ReadLine();
+
+    if (input == "1")
+    {
+        ListRestaurantAndMenuItems();
+    }
+    else if (input == "2")
+    {
+        ListAllOrders();
+    }
+
+    else if (input == "3")
+    {
+        CreateNewOrder();
+    }
+
+    else if (input == "4")
+    {
+        ProcessOrder();
+    }
+
+    else if (input == "5")
+    {
+        ModifyOrder();
+    }
+
+    else if (input == "6")
+    {
+        DeleteOrder();
+    }
+
+    else if (input == "0")//else if so code breaks only when user presses 0
+    {
+        break;
+    }
+}
+
+
+//load restaurants
 // Nur Tiara Nasha - Feature 1
 List<Restaurant> restaurants = new List<Restaurant>();
 List<OrderedFoodItem> orderedFoodItems = new List<OrderedFoodItem>();
-
-using (StreamReader sr = new StreamReader("restaurants.csv"))
+void LoadRestaurant()
 {
-    string line;
-    sr.ReadLine();
-
-    while ((line = sr.ReadLine()) != null)
+    using (StreamReader sr = new StreamReader("restaurants.csv"))
     {
-        string[] data = line.Split(",");
+        string line;
+        sr.ReadLine();
 
-        string id = data[0];
-        string name = data[1];
-        string email = data[2];
+        while ((line = sr.ReadLine()) != null)
+        {
+            string[] data = line.Split(",");
 
-        Restaurant r = new Restaurant(id, name, email);
-        restaurants.Add(r);
+            string id = data[0];
+            string name = data[1];
+            string email = data[2];
+            //creating restaurants objects
+            Restaurant r = new Restaurant(id, name, email);
+            restaurants.Add(r);
+        }
+
     }
-
 }
 
-//creating restaurants objects
-Restaurant r1 = new Restaurant("R001", "Grill House", "grillhouse@email.com");
-Restaurant r2 = new Restaurant("R002", "Noodle Palace", "noodlepalace@email.com");
-Restaurant r3 = new Restaurant("R003", "Bento Express", "bentoexpress@email.com");
-Restaurant r4 = new Restaurant("R004", "Pizza Corner", "pizzacorner@email.com");
-Restaurant r5 = new Restaurant("R005", "Salad Bar", "saladbar@email.com");
-Restaurant r6 = new Restaurant("R006", "Sushi Zen", "sushizen@email.com");
-Restaurant r7 = new Restaurant("R007", "Burger Barn", "burgerbarn@email.com");
-Restaurant r8 = new Restaurant("R008", "Taco Town", "tacotown@email.com");
-Restaurant r9 = new Restaurant("R009", "Pasta Pronto", "pastapronto@email.com");
-Restaurant r10 = new Restaurant("R010", "Steak Station", "steakstation@email.com");
-Restaurant r11 = new Restaurant("R011", "Curry Corner", "currycorner@email.com");
-Restaurant r12 = new Restaurant("R012", "Dim Sum Den", "dimsumden@email.com");
-Restaurant r13 = new Restaurant("R013", "Waffle World", "waffleworld@email.com");
-Restaurant r14 = new Restaurant("R014", "Soup Shack", "soupshack@email.com");
-Restaurant r15 = new Restaurant("R015", "Donut Delight", "donutdelight@email.com");
 
 //load fooditems.csv
 //Nur Tiara Nasha - Feature 1
+
 List<FoodItem> fooditem = new List<FoodItem>();
-
-using (StreamReader sr = new StreamReader("fooditems.csv"))
+void LoadFoodItem()
 {
-    string line;
-    sr.ReadLine(); // skip header
-
-    while ((line = sr.ReadLine()) != null)
+    using (StreamReader sr = new StreamReader("fooditems.csv"))
     {
-        string[] data = line.Split(",");
+        string line;
+        sr.ReadLine(); // skip header
 
-        string restaurantId = data[0];    // restaurant ID
-        string itemName = data[1];        // item name
-        string itemDesc = data[2];        // item description
-        double itemPrice = double.Parse(data[3]); //change string to double
-
-        // Step 3: create FoodItem object
-        FoodItem foodItem = new FoodItem(itemName, itemDesc, itemPrice, "");
-
-        // Step 4: find the correct restaurant
-        Restaurant r = restaurants.Find(res => res.RestaurantId == restaurantId);
-
-        // Step 5: assign the food item to that restaurant's menu
-        if (r != null)
+        while ((line = sr.ReadLine()) != null)
         {
-            r.Menus[0].AddFoodItem(foodItem);
+            string[] data = line.Split(",");
 
+            string restaurantId = data[0];    // restaurant ID
+            string itemName = data[1];        // item name
+            string itemDesc = data[2];        // item description
+            double itemPrice = double.Parse(data[3]); //change string to double
+
+            // create FoodItem object
+            FoodItem foodItem = new FoodItem(itemName, itemDesc, itemPrice, "");
+
+            // find the correct restaurant
+            Restaurant r = restaurants.Find(res => res.RestaurantId == restaurantId);
+
+            //  assign the food item to that restaurant's menu
+            if (r != null)
+            {
+                // If restaurant has no menu yet, create one
+                if (r.Menus.Count == 0)
+                {
+                    r.Menus.Add(new Menu("Main Menu"));
+                }
+
+                r.Menus[0].AddFoodItem(foodItem);
+                fooditem.Add(foodItem); // track total food items
+            }
         }
     }
 }
+
+
 
 // Joelle Heng - Feature 2
 List<Customer> customersList = new List<Customer>();
@@ -208,6 +266,47 @@ void ListRestaurantAndMenuItems()
         }
     }
 }
+// Nur Tiara Nasha - Feature 4
+void ListAllOrders()
+{
+    Console.WriteLine("\nAll Orders");
+    Console.WriteLine("==========");
+    Console.WriteLine("Order ID Customer       Restaurant       Delivery Date/Time     Amount   Status");
+    Console.WriteLine("-------- ------------- ---------------- ---------------------- -------- --------");
+
+    int orderCount = 0;
+
+    foreach (Customer cust in customersList)
+    {
+        foreach (Order order in cust.Orders)
+        {
+            orderCount++;
+
+            string restaurantName = "Unknown";
+            foreach (Restaurant r in restaurants)
+            {
+                if (r.Orders.Contains(order))
+                {
+                    restaurantName = r.RestaurantName;
+                    break;
+                }
+            }
+
+            Console.WriteLine(
+                $"{order.OrderId,-8}{cust.CustomerName,-13}{restaurantName,-16}{order.DeliveryDateTime:dd/MM/yyyy HH:mm,-22}${order.OrderTotal:0.00,-8}{order.OrderStatus,-10}"
+            );
+        }
+    }
+
+    if (orderCount == 0)
+    {
+        Console.WriteLine("No orders found.");
+    }
+}
+
+
+
+
 
 // Joelle Heng - Feature 5
 void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
@@ -563,4 +662,175 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         // 12) Confirmation
         Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
     }
+}
+
+
+// Nur Tiara Nasha - Feature 6
+
+void ProcessOrder()
+{
+    Console.WriteLine("Process Order");
+    Console.WriteLine("=============");
+    Console.Write("Enter Restaurant ID: ");
+    string restId = Console.ReadLine();
+
+    foreach (Restaurant r in restaurants)
+    {
+        if (r.RestaurantId == restId)
+        {
+            foreach (Order order in r.Orders)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Order {order.OrderId}:");
+                Console.WriteLine($"Customer: {order.Customer.CustomerName}");
+                Console.WriteLine("Ordered Items:");
+
+                int count = 1;
+                foreach (OrderedFoodItem item in order.OrderedFoodItems)
+                {
+                    Console.WriteLine($"{count}. {item.FoodItem.Name} - {item.Quantity}");
+                    count++;
+                }
+
+                Console.WriteLine($"Delivery date/time: {order.DeliveryDateTime:dd/MM/yyyy HH:mm}");
+                Console.WriteLine($"Total Amount: ${order.OrderTotal:0.00}");
+                Console.WriteLine($"Order Status: {order.OrderStatus}");
+
+                Console.Write("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
+                string choice = Console.ReadLine().ToUpper();
+
+                if (choice == "C")
+                {
+                    if (order.OrderStatus == "Pending")
+                    {
+                        order.OrderStatus = "Preparing";
+                        Console.WriteLine($"Order {order.OrderId} confirmed. Status: Preparing");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be confirmed.");
+                    }
+                }
+                else if (choice == "R")
+                {
+                    if (order.OrderStatus == "Pending")
+                    {
+                        order.OrderStatus = "Rejected";
+                        refundStack.Push(order);
+                        Console.WriteLine($"Order {order.OrderId} rejected. Refund initiated.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be rejected.");
+                    }
+                }
+                else if (choice == "S")
+                {
+                    if (order.OrderStatus == "Cancelled")
+                    {
+                        Console.WriteLine("Order skipped.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be skipped.");
+                    }
+                }
+                else if (choice == "D")
+                {
+                    if (order.OrderStatus == "Preparing")
+                    {
+                        order.OrderStatus = "Delivered";
+                        Console.WriteLine($"Order {order.OrderId} delivered.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be delivered.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option.");
+                }
+            }
+
+            return; // stop once restaurant is processed
+        }
+    }
+
+    Console.WriteLine("Restaurant not found.");
+}
+
+//Nur Tiara Nasha - Feature 8
+void DeleteOrder()
+{
+    Console.WriteLine("Delete Order");
+    Console.WriteLine("============");
+    Console.Write("Enter Customer Email: ");
+    string email = Console.ReadLine();
+
+    // find customer
+    foreach (Customer cust in customersList)
+    {
+        if (cust.EmailAddress == email)
+        {
+            Console.WriteLine("Pending Orders:");
+
+            // show pending orders
+            foreach (Order o in cust.Orders)
+            {
+                if (o.OrderStatus == "Pending")
+                {
+                    Console.WriteLine(o.OrderId);
+                }
+            }
+
+            Console.Write("Enter Order ID: ");
+            int orderId = Convert.ToInt32(Console.ReadLine());
+
+            // find the order
+            foreach (Order order in cust.Orders)
+            {
+                if (order.OrderId == orderId)
+                {
+                    Console.WriteLine($"Customer: {cust.CustomerName}");
+                    Console.WriteLine("Ordered Items:");
+
+                    int count = 1;
+                    foreach (OrderedFoodItem item in order.OrderedFoodItems)
+                    {
+                        Console.WriteLine($"{count}. {item.ItemName} - {item.QtyOrdered}");
+                        count++;
+                    }
+
+                    Console.WriteLine($"Delivery date/time: {order.DeliveryDateTime:dd/MM/yyyy HH:mm}");
+                    Console.WriteLine($"Total Amount: ${order.OrderTotal:0.00}");
+                    Console.WriteLine($"Order Status: {order.OrderStatus}");
+
+                    Console.Write("Confirm deletion? [Y/N]: ");
+                    string confirm = Console.ReadLine().ToUpper();
+
+                    if (confirm == "Y")
+                    {
+                        order.OrderStatus = "Cancelled";
+                        refundStack.Push(order);
+
+                        Console.WriteLine(
+                            $"Order {order.OrderId} cancelled. Refund of ${order.OrderTotal:0.00} processed."
+                        );
+                    }
+                    else
+                    {
+                        Console.WriteLine("Deletion cancelled.");
+                    }
+
+                    return; // stop after processing one order
+                }
+            }
+
+            Console.WriteLine("Order not found.");
+            return;
+        }
+    }
+
+    Console.WriteLine("Customer not found.");
 }
