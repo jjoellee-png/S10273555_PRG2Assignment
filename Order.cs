@@ -1,6 +1,14 @@
-﻿namespace PRG2Assignment
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+// Student Number: S10275515
+// Student Name: Nur Tiara Nasha
+// Partner Name: Joelle
+namespace PRG2Assignment
 {
-    class Order
+    public class Order
     {
         public int OrderId { get; set; }
         public DateTime OrderDateTime { get; set; }
