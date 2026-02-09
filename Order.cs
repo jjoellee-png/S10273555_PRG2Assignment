@@ -1,27 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-// Student Number: S10275515
-// Student Name: Nur Tiara Nasha
-// Partner Name: Joelle
-namespace PRG2Assignment
+﻿namespace PRG2Assignment
 {
     class Order
     {
         public int OrderId { get; set; }
         public DateTime OrderDateTime { get; set; }
         public double OrderTotal { get; set; }
-        private double orderTotal;
         public string OrderStatus { get; set; }
         public DateTime DeliveryDateTime { get; set; }
-        public string DeliveryAddress { get; set; }
-        public string OrderPaymentMethod { get; set; }
+        public string DeliveryAddress { get; set; } = "";
+        public string OrderPaymentMethod { get; set; } = "";
         public bool OrderPaid { get; set; }
 
         public List<OrderedFoodItem> OrderedFoodItems { get; set; }
 
+        // Constructor with just ID
+        public Order(int id)
+        {
+            OrderId = id;
+            OrderDateTime = DateTime.Now;
+            OrderStatus = "Pending";
+            OrderPaid = false;
+            OrderedFoodItems = new List<OrderedFoodItem>();
+        }
+
+        // Full constructor
         public Order(int orderId, DateTime orderDateTime, string status,
              string deliveryAddress, string paymentMethod)
         {
@@ -34,13 +36,7 @@ namespace PRG2Assignment
             OrderedFoodItems = new List<OrderedFoodItem>();
         }
 
-        public Order(int id)
-        {
-            OrderId = id;
-            OrderDateTime = DateTime.Now;
-            OrderStatus = "Pending";
-            OrderPaid = false;
-        }
+        // Constructor with order total
         public Order(int orderId, DateTime orderDateTime, string status,
              string deliveryAddress, string paymentMethod, double orderTotal)
         {
@@ -57,12 +53,10 @@ namespace PRG2Assignment
         public double CalculateOrderTotal()
         {
             OrderTotal = 0;
-
             foreach (OrderedFoodItem item in OrderedFoodItems)
             {
                 OrderTotal += item.CalculateSubtotal();
             }
-
             return OrderTotal;
         }
 
@@ -86,7 +80,7 @@ namespace PRG2Assignment
 
         public override string ToString()
         {
-            return $"Order {OrderId} - Total: ${OrderTotal}";
+            return $"Order {OrderId} - Total: ${OrderTotal:0.00}";
         }
     }
 }

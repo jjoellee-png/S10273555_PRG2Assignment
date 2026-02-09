@@ -8,22 +8,18 @@ using System.Threading.Tasks;
 // Partner Name: Joelle
 namespace PRG2Assignment
 {
-    class Customer
+    public class Customer
     {
-        public string EmailAddress { get; set; }
-        public string CustomerName { get; set; }
-        public List<Order> Orders { get; set; }
+        public string EmailAddress { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public List<Order> Orders { get; set; } = new List<Order>();
 
-        public Customer()
-        {
-            Orders = new List<Order>();
-        }
+        public Customer() { }
 
         public Customer(string eAdd, string custName)
         {
             CustomerName = custName;
             EmailAddress = eAdd;
-            CustomerName = custName;
         }
 
         public void AddOrder(Order order)

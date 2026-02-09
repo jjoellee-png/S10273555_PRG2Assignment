@@ -1,29 +1,20 @@
-﻿using S10273555_PRG2Assignment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-// Student Number: S10275515
-// Student Name: Nur Tiara Nasha
-// Partner Name: Joelle
-namespace PRG2Assignment
+﻿namespace PRG2Assignment
 {
     class Restaurant
     {
-        public string RestaurantId { get; set; }
-        public string RestaurantName { get; set; }
-        public string RestaurantEmail { get; set; }
+        public string RestaurantId { get; set; } = "";
+        public string RestaurantName { get; set; } = "";
+        public string RestaurantEmail { get; set; } = "";
 
-        public List<Menu> menu = new List<Menu>();
-        public List<SpecialOffer> offers = new List<SpecialOffer>();
-        public Queue<Order> orders = new Queue<Order>();
         public List<Menu> Menus { get; set; }
         public List<SpecialOffer> Offers { get; set; }
+        public Queue<Order> Orders { get; set; }
+
         public Restaurant()
         {
             Menus = new List<Menu>();
             Offers = new List<SpecialOffer>();
+            Orders = new Queue<Order>();
         }
 
         public Restaurant(string rId, string rName, string rEmail)
@@ -33,11 +24,15 @@ namespace PRG2Assignment
             RestaurantEmail = rEmail;
             Menus = new List<Menu>();
             Offers = new List<SpecialOffer>();
+            Orders = new Queue<Order>();
         }
 
         public void DisplayOrders()
         {
-            
+            foreach (var order in Orders)
+            {
+                Console.WriteLine(order);
+            }
         }
 
         public void DisplaySpecialOffers()
@@ -72,4 +67,3 @@ namespace PRG2Assignment
         }
     }
 }
-
