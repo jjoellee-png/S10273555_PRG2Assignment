@@ -20,6 +20,8 @@ LoadOrders();
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurants.Count} restaurants loaded!");  // - Tiara
 Console.WriteLine($"{fooditem.Count} food items loaded!"); // - Tiara
+Console.WriteLine($"{customersList.Count} restaurants loaded!");  // - Joelle
+Console.WriteLine($"{ordersList.Count} food items loaded!"); // - Joelle
 
 while (true)
 {
@@ -30,6 +32,8 @@ while (true)
     Console.WriteLine("4. Process an order");
     Console.WriteLine("5. Modify an existing order");
     Console.WriteLine("6. Delete an existing order");
+    Console.WriteLine("7. Bulk processing of unprocessed orders for a current day");
+    Console.WriteLine("8. Display total order amount");
     Console.WriteLine("0. Exit");
     Console.Write("Enter your choice: ");
 
@@ -64,9 +68,14 @@ while (true)
         DeleteOrder();
     }
 
-    else if (input == "9")
+    else if (input == "7")
     {
         BulkProcessTodayOrders();
+    }
+
+    else if (input == "8")
+    {
+        DisplayTotalOrderAmount();
     }
 
     else if (input == "0")//else if so code breaks only when user presses 0
@@ -80,7 +89,7 @@ while (true)
 // Nur Tiara Nasha - Feature 1
 void LoadRestaurant()
 {
-    using (StreamReader sr = new StreamReader("restaurants.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\restaurants.csv"))
     {
         string line;
         sr.ReadLine();
@@ -105,7 +114,7 @@ void LoadRestaurant()
 //Nur Tiara Nasha - Feature 1
 void LoadFoodItem()
 {
-    using (StreamReader sr = new StreamReader("fooditems - Copy.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\fooditems - Copy.csv"))
     {
         string line;
         sr.ReadLine(); // skip header
@@ -146,7 +155,7 @@ void LoadFoodItem()
 // Joelle Heng - Feature 2
 void LoadCustomers()
 {
-    using (StreamReader sr = new StreamReader("customers.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\customers.csv"))
     {
         string header = sr.ReadLine(); // reads the first line, skips the header
         string? line; // allows the line to hold any null value (if any)
@@ -165,7 +174,7 @@ void LoadCustomers()
 
 void LoadOrders()
 {
-    using (StreamReader sr = new StreamReader("orders - Copy.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\orders - Copy.csv"))
     {
         string header = sr.ReadLine();
         string? line;
@@ -1337,4 +1346,54 @@ void DeleteOrder()
     }
 
     Console.WriteLine("Customer not found.");
+}
+
+// Nur Tiara Nasha - Advanced (b)
+void DisplayTotalOrderAmount()
+{
+    Console.WriteLine("\n===== Total Revenue =====");
+
+    double totalOrdersAmount = 0.0;
+    double totalRefunds = 0.0;
+
+    foreach (Restaurant r in restaurants)
+    {
+        double restaurantDeliveredTotal = 0.0;
+        double restaurantRefundTotal = 0.0;
+
+        //for successful delivered orders
+        foreach (Order order in r.Orders)
+        {
+            if (order.OrderStatus == "Delivered")
+            {
+                //subtract delivery fee
+                double orderNet = order.OrderTotal - 5.00; // assuming the delivery fee
+                restaurantDeliveredTotal += orderNet;
+            }
+        }
+        //refunded orders
+        foreach (Order refundedOrder in refundStack)
+        {
+            if (refundedOrder.RestaurantId == r.RestaurantId)
+            {
+                restaurantRefundTotal += refundedOrder.OrderTotal;
+            }
+        }
+
+        //display for each rest
+
+        Console.WriteLine($"\nRestaurant: {r.RestaurantName} ({r.RestaurantId})");
+        Console.WriteLine($"  Total Delivered Orders (less delivery fee): ${restaurantDeliveredTotal:0.00}");
+        Console.WriteLine($"  Total Refunds: ${restaurantRefundTotal:0.00}");
+
+        totalOrdersAmount += restaurantDeliveredTotal;
+        totalRefunds += restaurantRefundTotal;
+    }
+
+    double totalEarnings = totalOrdersAmount - totalRefunds;
+    //print
+    Console.WriteLine("\n===== Overall Totals =====");
+    Console.WriteLine($"Total Orders Amount: ${totalOrdersAmount:0.00}");
+    Console.WriteLine($"Total Refunds: ${totalRefunds:0.00}");
+    Console.WriteLine($"Final Amount Gruberoo Earns: ${totalEarnings:0.00}");
 }
