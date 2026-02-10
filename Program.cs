@@ -10,6 +10,7 @@ List<FoodItem> fooditem = new List<FoodItem>();
 List<Customer> customersList = new List<Customer>();
 List<Order> ordersList = new List<Order>();
 Stack<Order> refundStack = new Stack<Order>();
+Queue<Order> orderqueue = new Queue<Order>();
 
 
 // load saved queues and stacks 
@@ -131,7 +132,7 @@ while (true)
     else if (input == "7")
 
     {
-        BulkProcessTodayOrders();
+        BulkOrder();
     }
 
     else if (input == "8")
@@ -323,12 +324,13 @@ void LoadOrders()
             {
                 if (restaurant.RestaurantId == restaurantId)
                 {
-                    restaurant.Orders.Enqueue(order);
+                    restaurant.Orders.Enqueue(order); // first in first out - add item to back of queue
                 }
             }
         }
     }
 }
+
 
 // Joelle Heng - Feature 3
 void ListRestaurantAndMenuItems()
@@ -372,6 +374,7 @@ void ListRestaurantAndMenuItems()
     }
 }
 
+
 // Nur Tiara Nasha - Feature 4
 void ListAllOrders()
 {
@@ -409,6 +412,7 @@ void ListAllOrders()
         Console.WriteLine("No orders found.");
     }
 }
+
 
 // Joelle Heng - Feature 5
 void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
@@ -659,7 +663,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         while (specialRequest.Trim() == "")
         {
             Console.Write("Enter special request: ");
-            specialRequest = Console.ReadLine() ?? "";
+            specialRequest = Console.ReadLine() ?? ""; // if not null, use, if null, use empty string ("")
             specialRequest = specialRequest.Trim();
             if (specialRequest == "")
                 Console.WriteLine("Special request cannot be empty.");
@@ -785,6 +789,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
 }
 
+
 //Nur Tiara Nasha - Feature 6
 void ProcessOrder()
 {
@@ -879,87 +884,6 @@ void ProcessOrder()
     Console.WriteLine("Restaurant not found.");
 }
 
-// Joelle Heng - Advanced (a)
-void BulkProcessTodayOrders()
-{
-    Console.WriteLine("\nBulk processing pending orders for today");
-    Console.WriteLine("========================================");
-
-    DateTime today = DateTime.Today;
-    DateTime now = DateTime.Now;
-
-    // collect pending orders in queues for today
-    List<Order> pendingToday = new List<Order>();
-    foreach (Restaurant r in restaurants)
-    {
-        if (r.Orders == null) continue;
-        foreach (Order order in r.Orders)
-        {
-            if (order == null) continue;
-            if (order.OrderStatus != null && order.OrderStatus.ToLower() == "pending" && order.DeliveryDateTime.Date == today)
-            {
-                pendingToday.Add(order);
-            }
-        }
-    }
-
-    Console.WriteLine($"Total pending orders in queues for today: {pendingToday.Count}");
-    if (pendingToday.Count == 0)
-    {
-        Console.WriteLine("No pending orders to process for today.");
-        return;
-    }
-
-    int processedCount = 0;
-    int preparingCount = 0;
-    int rejectedCount = 0;
-
-    foreach (Order order in pendingToday)
-    {
-        TimeSpan timeUntilDelivery = order.DeliveryDateTime - now;
-
-        if (timeUntilDelivery.TotalHours < 1.0)
-        {
-            // auto-reject
-            if (order.OrderStatus != null && order.OrderStatus.ToLower() == "pending")
-            {
-                order.OrderStatus = "Rejected";
-                // keep same pattern as other parts of code (push to refundStack)
-                try
-                {
-                    refundStack.Push(order);
-                }
-                catch
-                {
-                    // if refundStack not available, continue without stopping bulk processing
-                }
-                rejectedCount++;
-                processedCount++;
-                Console.WriteLine($"Order {order.OrderId} => Rejected (delivery in {timeUntilDelivery.TotalMinutes:0} minutes)");
-            }
-        }
-        else
-        {
-            // auto-prepare
-            if (order.OrderStatus != null && order.OrderStatus.ToLower() == "pending")
-            {
-                order.OrderStatus = "Preparing";
-                preparingCount++;
-                processedCount++;
-                Console.WriteLine($"Order {order.OrderId} => Preparing (delivery at {order.DeliveryDateTime:HH:mm})");
-            }
-        }
-    }
-
-    double percentProcessed = (pendingToday.Count > 0) ? (processedCount / (double)pendingToday.Count * 100.0) : 0.0;
-
-    Console.WriteLine("\nBulk processing summary:");
-    Console.WriteLine($" - Total pending today: {pendingToday.Count}");
-    Console.WriteLine($" - Orders processed: {processedCount}");
-    Console.WriteLine($"   - Preparing: {preparingCount}");
-    Console.WriteLine($"   - Rejected: {rejectedCount}");
-    Console.WriteLine($" - Percentage auto-processed: {percentProcessed:0.00}%");
-}
 
 // Joelle Heng - Feature 7
 void ModifyOrder()
@@ -1377,6 +1301,7 @@ void ModifyOrder()
     order.OrderTotal = newTotal;
 }
 
+
 //Nur Tiara Nasha - Feature 8
 void DeleteOrder()
 {
@@ -1451,6 +1376,81 @@ void DeleteOrder()
 
     Console.WriteLine("Customer not found.");
 }
+
+
+// Joelle Heng - Advanced (a)
+void BulkOrder()
+{
+    DateTime now = DateTime.Now;
+    DateTime today = now.Date;
+
+    // ensure queue is empty before collecting
+    orderqueue.Clear();
+
+    // collect pending orders for today from each restaurant queue
+    foreach (Restaurant restaurant in restaurants)
+    {
+        if (restaurant.Orders != null)
+        {
+            foreach (Order order in restaurant.Orders)
+            {
+                if (order != null)
+                {
+                    string status = (order.OrderStatus ?? "").Trim().ToLower();
+                    if (status == "pending" && order.DeliveryDateTime.Date == today)
+                    {
+                        orderqueue.Enqueue(order);
+                    }
+                }
+            }
+        }
+    }
+
+    int totalPending = orderqueue.Count;
+    Console.WriteLine($"Total Pending Order Queues for Today: {totalPending}");
+
+    int rejectedCount = 0;
+    int preparingCount = 0;
+
+    while (orderqueue.Count > 0)
+    {
+        Order order = orderqueue.Dequeue(); // remove item from front of queue
+
+        // compute minutes until delivery 
+        TimeSpan ts = order.DeliveryDateTime - now;
+        int minutesUntilDelivery = ts.Days * 24 * 60 + ts.Hours * 60 + ts.Minutes; // ts.days is converting 1 day to hours to minutes, ts.hours converts hour to minues
+        if (minutesUntilDelivery < 0) minutesUntilDelivery = 0;
+
+        if (minutesUntilDelivery < 60)
+        {
+            order.OrderStatus = "Rejected";
+            rejectedCount++;
+            try { refundStack.Push(order); } catch { } // push rejected order onto stack
+            Console.WriteLine($"Order {order.OrderId} => Rejected (delivery in {minutesUntilDelivery} minutes)");
+        }
+        else
+        {
+            order.OrderStatus = "Preparing";
+            preparingCount++;
+            Console.WriteLine($"Order {order.OrderId} => Preparing (delivery at {order.DeliveryDateTime:HH:mm})"); //HH:mm is 24 hour, hh:mm is 12 hour
+        }
+    }
+
+    int processedCount = rejectedCount + preparingCount;
+
+    double percent = 0.0;
+    if (ordersList != null && ordersList.Count > 0)
+    {
+        percent = (double)processedCount / ordersList.Count * 100.0;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"Total Orders Processed for Today: {processedCount}");
+    Console.WriteLine($"Preparing: {preparingCount}  Rejected: {rejectedCount}");
+    Console.WriteLine($"Percentage of automatically processed orders out of all orders: {percent:0.00}%");
+    Console.WriteLine();
+}
+
 
 // Nur Tiara Nasha - Advanced (b)
 void DisplayTotalOrderAmount()
