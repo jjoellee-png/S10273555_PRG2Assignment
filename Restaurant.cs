@@ -27,14 +27,13 @@ namespace PRG2Assignment
             Orders = new Queue<Order>();
         }
 
-        public Restaurant(string rId, string rName, string rEmail)
+        public Restaurant(string rId, string rName, string rEmail) : this() //chain the constructor to avoid repeated code
+
         {
             RestaurantId = rId;
             RestaurantName = rName;
             RestaurantEmail = rEmail;
-            Menus = new List<Menu>();
-            Offers = new List<SpecialOffer>();
-            Orders = new Queue<Order>();
+            
         }
 
         public void DisplayOrders()
