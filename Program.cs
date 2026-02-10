@@ -83,7 +83,7 @@ void AppendNotification(Order order, string status)
         // create file with header if missing
         if (!File.Exists(file))
         {
-            File.WriteAllText(file, "Timestamp,OrderId,CustomerEmail,RestaurantId,Status,DeliveryDateTime" + Environment.NewLine);
+            File.WriteAllText(file, "Timestamp,OrderId,CustomerEmail,RestaurantId,Status,DeliveryDateTime" + Environment.NewLine); // environment.newline is to move on to next line
         }
 
         string timestamp = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
@@ -142,6 +142,7 @@ while (true)
     Console.WriteLine("6. Delete an existing order");
     Console.WriteLine("7. Bulk processing of unprocessed orders for a current day");
     Console.WriteLine("8. Display total order amount");
+    Console.WriteLine("9. Top 3 food items (bonus)");
     Console.WriteLine("0. Exit");
     Console.Write("Enter your choice: ");
 
@@ -185,6 +186,11 @@ while (true)
     else if (input == "8")
     {
         DisplayTotalOrderAmount();
+    }
+
+    else if (input == "9")
+    {
+        TopFoodItems();
     }
 
     else if (input == "0")//else if so code breaks only when user presses 0
@@ -899,15 +905,19 @@ void ProcessOrder()
 {
     Console.WriteLine("Process Order");
     Console.WriteLine("=============");
+
+    // Ask user for restaurant ID
     Console.Write("Enter Restaurant ID: ");
     string restId = Console.ReadLine()?.Trim() ?? "";
 
+    // Check if input is empty
     if (string.IsNullOrEmpty(restId))
     {
         Console.WriteLine("Restaurant ID cannot be empty.");
         return;
     }
 
+    // Find the restaurant in the list
     Restaurant r = restaurants.Find(x => x.RestaurantId.Equals(restId, StringComparison.OrdinalIgnoreCase));
     if (r == null)
     {
@@ -915,16 +925,19 @@ void ProcessOrder()
         return;
     }
 
+    // Check if there are orders in the restaurant
     if (r.Orders.Count == 0)
     {
         Console.WriteLine("No orders in this restaurant queue.");
         return;
     }
 
+    // Loop through each order
     foreach (Order order in r.Orders)
     {
         try
         {
+            // Display order details
             Console.WriteLine($"\nOrder {order.OrderId}: Customer: {order.Customer.CustomerName}");
             int count = 1;
             foreach (OrderedFoodItem item in order.OrderedFoodItems)
@@ -934,60 +947,59 @@ void ProcessOrder()
             Console.WriteLine($"Total: ${order.OrderTotal:0.00}");
             Console.WriteLine($"Status: {order.OrderStatus}");
 
+            // Ask user what to do with the order
             Console.Write("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
             string choice = Console.ReadLine()?.Trim().ToUpper() ?? "";
 
-            switch (choice)
+            // Simple if-else instead of switch
+            if (choice == "C")
             {
-                case "C":
-                    if (order.OrderStatus == "Pending")
-                    {
-                        order.OrderStatus = "Preparing";
-                        AppendNotification(order, "Preparing");
-                        Console.WriteLine($"Order {order.OrderId} confirmed. Status: Preparing");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Order cannot be confirmed.");
-                    }
-                    break;
-
-                case "R":
-                    if (order.OrderStatus == "Pending")
-                    {
-                        order.OrderStatus = "Rejected";
-                        refundStack.Push(order);
-                        AppendNotification(order, "Rejected");
-                        Console.WriteLine($"Order {order.OrderId} rejected. Refund initiated.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Order cannot be rejected.");
-                    }
-                    break;
-
-                case "S":
-                    Console.WriteLine("Skipped order.");
-                    break;
-
-                case "D":
-                    if (order.OrderStatus == "Preparing")
-                    {
-                        order.OrderStatus = "Delivered";
-                        AppendNotification(order, "Delivered");
-                        Console.WriteLine($"Order {order.OrderId} delivered.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Order cannot be delivered.");
-                    }
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid option.");
-                    break;
+                if (order.OrderStatus == "Pending")
+                {
+                    order.OrderStatus = "Preparing";
+                    AppendNotification(order, "Preparing");
+                    Console.WriteLine($"Order {order.OrderId} confirmed. Status: Preparing");
+                }
+                else
+                {
+                    Console.WriteLine("Order cannot be confirmed.");
+                }
             }
-
+            else if (choice == "R")
+            {
+                if (order.OrderStatus == "Pending")
+                {
+                    order.OrderStatus = "Rejected";
+                    refundStack.Push(order); // Add to refund stack
+                    AppendNotification(order, "Rejected");
+                    Console.WriteLine($"Order {order.OrderId} rejected. Refund initiated.");
+                }
+                else
+                {
+                    Console.WriteLine("Order cannot be rejected.");
+                }
+            }
+            else if (choice == "S")
+            {
+                Console.WriteLine("Skipped order.");
+            }
+            else if (choice == "D")
+            {
+                if (order.OrderStatus == "Preparing")
+                {
+                    order.OrderStatus = "Delivered";
+                    AppendNotification(order, "Delivered");
+                    Console.WriteLine($"Order {order.OrderId} delivered.");
+                }
+                else
+                {
+                    Console.WriteLine("Order cannot be delivered.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid option.");
+            }
         }
         catch (Exception ex)
         {
@@ -1616,4 +1628,50 @@ void DisplayTotalOrderAmount()
     Console.WriteLine($"Total Orders Amount: ${totalOrdersAmount:0.00}");
     Console.WriteLine($"Total Refunds: ${totalRefunds:0.00}");
     Console.WriteLine($"Final Amount Gruberoo Earns: ${totalEarnings:0.00}");
+}
+
+// Nur Tiara Nasha - Bonus Feature: top 3 most ordered food items
+
+void TopFoodItems()
+{
+    if (ordersList == null || ordersList.Count == 0)
+    {
+        Console.WriteLine("No orders available.");
+        return;
+    }
+
+    // Count how many times each food item was ordered
+    Dictionary<string, int> foodCount = new Dictionary<string, int>();
+
+    foreach (Order o in ordersList)
+    {
+        if (o == null || o.OrderedFoodItems == null) continue;
+
+        foreach (OrderedFoodItem item in o.OrderedFoodItems)
+        {
+            if (item == null || string.IsNullOrEmpty(item.ItemName)) continue;
+
+            if (foodCount.ContainsKey(item.ItemName))
+                foodCount[item.ItemName] += item.QtyOrdered;
+            else
+                foodCount[item.ItemName] = item.QtyOrdered;
+        }
+    }
+
+    if (foodCount.Count == 0)
+    {
+        Console.WriteLine("No food items found in orders.");
+        return;
+    }
+
+    // Sort descending and take top 3
+    var top3 = foodCount.OrderByDescending(x => x.Value).Take(3);
+
+    Console.WriteLine("\nTop 3 Most Ordered Food Items:");
+    int rank = 1;
+    foreach (var f in top3)
+    {
+        Console.WriteLine($"{rank}. {f.Key} - {f.Value} orders");
+        rank++;
+    }
 }
