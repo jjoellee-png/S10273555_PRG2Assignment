@@ -227,8 +227,8 @@ void LoadOrders()
 
             foreach (string item in items)
             {
-                string[] itemsPart = item.Split(","); // changed items[0] to item so that item wont repeat
-                string itemName = itemsPart[0].Trim();
+                string[] itemsPart = item.Split(","); 
+                string itemName = itemsPart[0].Trim(); // changed items[0] to item so that item wont repeat
                 int qty = Convert.ToInt32(itemsPart[1].Trim());
 
                 foreach (var foodItem in fooditem)
