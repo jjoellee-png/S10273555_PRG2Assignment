@@ -11,11 +11,71 @@ List<Customer> customersList = new List<Customer>();
 List<Order> ordersList = new List<Order>();
 Stack<Order> refundStack = new Stack<Order>();
 
+
+// load saved queues and stacks 
+void SaveData()
+{
+    // Save queue (all orders)
+    using (StreamWriter sw = new StreamWriter("queue.csv"))
+    {
+        foreach (Order o in ordersList)
+        {
+            sw.WriteLine($"{o.OrderId},{o.CustomerEmail},{o.RestaurantId},{o.DeliveryDateTime},{o.DeliveryAddress},{o.OrderTotal},{o.OrderStatus}");
+        }
+    }
+
+    // Save refund stack
+    using (StreamWriter sw = new StreamWriter("stack.csv"))
+    {
+        foreach (Order o in refundStack)
+        {
+            sw.WriteLine($"{o.OrderId},{o.CustomerEmail},{o.RestaurantId},{o.DeliveryDateTime},{o.DeliveryAddress},{o.OrderTotal},{o.OrderStatus}");
+        }
+    }
+}
+
+void LoadData()
+{
+    // Load queue
+    if (File.Exists("queue.csv"))
+    {
+        foreach (string line in File.ReadAllLines("queue.csv"))
+        {
+            string[] parts = line.Split(',');
+            Order o = new Order(int.Parse(parts[0]));
+            o.CustomerEmail = parts[1];
+            o.RestaurantId = parts[2];
+            o.DeliveryDateTime = DateTime.Parse(parts[3]);
+            o.DeliveryAddress = parts[4];
+            o.OrderTotal = double.Parse(parts[5]);
+            o.OrderStatus = parts[6];
+            ordersList.Add(o);
+        }
+    }
+
+    // Load refund stack
+    if (File.Exists("stack.csv"))
+    {
+        foreach (string line in File.ReadAllLines("stack.csv"))
+        {
+            string[] parts = line.Split(',');
+            Order o = new Order(int.Parse(parts[0]));
+            o.CustomerEmail = parts[1];
+            o.RestaurantId = parts[2];
+            o.DeliveryDateTime = DateTime.Parse(parts[3]);
+            o.DeliveryAddress = parts[4];
+            o.OrderTotal = double.Parse(parts[5]);
+            o.OrderStatus = parts[6];
+            refundStack.Push(o);
+        }
+    }
+}
 // main option code
 LoadRestaurant();
 LoadFoodItem();
 LoadCustomers();
 LoadOrders();
+LoadData();
 
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurants.Count} restaurants loaded!");  // - Tiara
@@ -81,6 +141,8 @@ while (true)
 
     else if (input == "0")//else if so code breaks only when user presses 0
     {
+        SaveData();
+        Console.WriteLine("Data saved. Goodbye!");
         break;
     }
 }
@@ -216,6 +278,7 @@ void LoadOrders()
             string status = parts[8];
 
             Order order = new Order(orderId);
+            order.RestaurantId = restaurantId;
             order.DeliveryDateTime = deliveryDateTime;
             order.DeliveryAddress = deliveryAddress;
             order.OrderDateTime = createdDateTime;
@@ -242,6 +305,10 @@ void LoadOrders()
             }
 
             ordersList.Add(order);
+            if (order.OrderStatus == "Cancelled" || order.OrderStatus == "Rejected")
+            {
+                refundStack.Push(order);
+            }
 
             foreach (Customer customer in customersList)
             {
@@ -1392,6 +1459,7 @@ void DisplayTotalOrderAmount()
 
     double totalOrdersAmount = 0.0;
     double totalRefunds = 0.0;
+    double totalOrdersWithDelivery = 0.0;
 
     foreach (Restaurant r in restaurants)
     {
@@ -1406,6 +1474,7 @@ void DisplayTotalOrderAmount()
                 //subtract delivery fee
                 double orderNet = order.OrderTotal - 5.00; // assuming the delivery fee
                 restaurantDeliveredTotal += orderNet;
+                totalOrdersWithDelivery += order.OrderTotal;
             }
         }
         //refunded orders
@@ -1420,14 +1489,14 @@ void DisplayTotalOrderAmount()
         //display for each rest
 
         Console.WriteLine($"\nRestaurant: {r.RestaurantName} ({r.RestaurantId})");
-        Console.WriteLine($"  Total Delivered Orders (less delivery fee): ${restaurantDeliveredTotal:0.00}");
+        Console.WriteLine($"  Total Delivered Orders (w/o delivery fee): ${restaurantDeliveredTotal:0.00}");
         Console.WriteLine($"  Total Refunds: ${restaurantRefundTotal:0.00}");
 
         totalOrdersAmount += restaurantDeliveredTotal;
         totalRefunds += restaurantRefundTotal;
     }
 
-    double totalEarnings = totalOrdersAmount - totalRefunds;
+    double totalEarnings = totalOrdersWithDelivery - totalRefunds;
     //print
     Console.WriteLine("\n===== Overall Totals =====");
     Console.WriteLine($"Total Orders Amount: ${totalOrdersAmount:0.00}");
