@@ -90,7 +90,7 @@ while (true)
 // Nur Tiara Nasha - Feature 1
 void LoadRestaurant()
 {
-    using (StreamReader sr = new StreamReader("restaurants.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\restaurants.csv"))
     {
         string line;
         sr.ReadLine();
@@ -115,7 +115,7 @@ void LoadRestaurant()
 //Nur Tiara Nasha - Feature 1
 void LoadFoodItem()
 {
-    using (StreamReader sr = new StreamReader("fooditems - Copy.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\fooditems - Copy.csv"))
     {
         string line;
         sr.ReadLine(); // skip header
@@ -156,7 +156,7 @@ void LoadFoodItem()
 // Joelle Heng - Feature 2
 void LoadCustomers()
 {
-    using (StreamReader sr = new StreamReader("customers.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\customers.csv"))
     {
         string header = sr.ReadLine(); // reads the first line, skips the header
         string? line; // allows the line to hold any null value (if any)
@@ -175,7 +175,7 @@ void LoadCustomers()
 
 void LoadOrders()
 {
-    using (StreamReader sr = new StreamReader("orders - Copy.csv"))
+    using (StreamReader sr = new StreamReader("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\orders - Copy.csv"))
     {
         string header = sr.ReadLine();
         string? line;
@@ -332,11 +332,11 @@ void ListAllOrders()
             }
 
             Console.WriteLine(
-                $"{order.OrderId,-8}{cust.CustomerName,-13}{restaurantName,-16}{order.DeliveryDateTime:dd/MM/yyyy HH:mm,-22}${order.OrderTotal:0.00,-8}{order.OrderStatus,-10}"
+                $"{order.OrderId,-10}{cust.CustomerName,-13}{restaurantName,-18}{order.DeliveryDateTime,-22:dd/MM/yyyy HH:mm}${order.OrderTotal,-8:0.00,}{order.OrderStatus,-10}"
             );
         }
     }
-
+    
     if (orderCount == 0)
     {
         Console.WriteLine("No orders found.");
@@ -709,7 +709,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         safeRequest + "," +
         itemsPart;
 
-    using (StreamWriter sw = new StreamWriter("orders - Copy.csv", true))
+    using (StreamWriter sw = new StreamWriter("C:\\Users\\nurti\\OneDrive\\Documents\\Assignment(PRG)\\PRG2 Assignment\\orders - Copy.csv", true))
     {
         sw.WriteLine("");
     }
@@ -718,7 +718,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
 }
 
-// Process order
+//Nur Tiara Nasha - Feature 6
 void ProcessOrder()
 {
     Console.WriteLine("Process Order");
