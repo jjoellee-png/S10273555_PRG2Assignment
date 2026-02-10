@@ -71,6 +71,53 @@ void LoadData()
         }
     }
 }
+
+
+// Joelle Heng - Bonus Feature: Customer Notifications
+void AppendNotification(Order order, string status)
+{
+    try
+    {
+        string file = "notifications.csv";
+
+        // create file with header if missing
+        if (!File.Exists(file))
+        {
+            File.WriteAllText(file, "Timestamp,OrderId,CustomerEmail,RestaurantId,Status,DeliveryDateTime" + Environment.NewLine);
+        }
+
+        string timestamp = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+        string cust = "";
+
+        if (!string.IsNullOrEmpty(order.CustomerEmail))
+        {
+            cust = order.CustomerEmail;
+        }
+        else if (order.Customer != null && !string.IsNullOrEmpty(order.Customer.EmailAddress))
+        {
+            cust = order.Customer.EmailAddress;
+        }
+        else
+        {
+            cust = "unknown@email.com";
+        }
+
+        cust = cust.Replace(",", " ");
+
+        string rest = (order.RestaurantId ?? (order.Restaurant != null ? order.Restaurant.RestaurantId : "") ?? "").Replace(",", " ");
+        string delivery = order.DeliveryDateTime.ToString("dd/MM/yyyy HH:mm");
+
+        string line = $"{timestamp},{order.OrderId},{cust},{rest},{status},{delivery}";
+        using (StreamWriter sw = new StreamWriter(file, true))
+        {
+            sw.WriteLine(line);
+        }
+    }
+    catch
+    {
+        // keep application robust if logging fails
+    }
+}
 // main option code
 LoadRestaurant();
 LoadFoodItem();
@@ -306,6 +353,7 @@ void LoadOrders()
             string status = parts[8];
 
             Order order = new Order(orderId);
+            order.CustomerEmail = custEmail;
             order.RestaurantId = restaurantId;
             order.DeliveryDateTime = deliveryDateTime;
             order.DeliveryAddress = deliveryAddress;
@@ -785,6 +833,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     rest.Orders.Enqueue(newOrder);
     cust.AddOrder(newOrder);
     ordersList.Add(newOrder);
+    AppendNotification(newOrder, "Created");
 
     // build csv items part (name,qty|name,qty)
     string itemsPart = "";
@@ -891,28 +940,54 @@ void ProcessOrder()
             switch (choice)
             {
                 case "C":
-                    if (order.OrderStatus == "Pending") order.OrderStatus = "Preparing";
-                    else Console.WriteLine("Order cannot be confirmed.");
+                    if (order.OrderStatus == "Pending")
+                    {
+                        order.OrderStatus = "Preparing";
+                        AppendNotification(order, "Preparing");
+                        Console.WriteLine($"Order {order.OrderId} confirmed. Status: Preparing");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be confirmed.");
+                    }
                     break;
+
                 case "R":
                     if (order.OrderStatus == "Pending")
                     {
                         order.OrderStatus = "Rejected";
                         refundStack.Push(order);
+                        AppendNotification(order, "Rejected");
+                        Console.WriteLine($"Order {order.OrderId} rejected. Refund initiated.");
                     }
-                    else Console.WriteLine("Order cannot be rejected.");
+                    else
+                    {
+                        Console.WriteLine("Order cannot be rejected.");
+                    }
                     break;
+
                 case "S":
                     Console.WriteLine("Skipped order.");
                     break;
+
                 case "D":
-                    if (order.OrderStatus == "Preparing") order.OrderStatus = "Delivered";
-                    else Console.WriteLine("Order cannot be delivered.");
+                    if (order.OrderStatus == "Preparing")
+                    {
+                        order.OrderStatus = "Delivered";
+                        AppendNotification(order, "Delivered");
+                        Console.WriteLine($"Order {order.OrderId} delivered.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order cannot be delivered.");
+                    }
                     break;
+
                 default:
                     Console.WriteLine("Invalid option.");
                     break;
             }
+
         }
         catch (Exception ex)
         {
@@ -1391,6 +1466,7 @@ void DeleteOrder()
                     {
                         order.OrderStatus = "Cancelled";
                         refundStack.Push(order);
+                        AppendNotification(order, "Cancelled");
 
                         Console.WriteLine(
                             $"Order {order.OrderId} cancelled. Refund of ${order.OrderTotal:0.00} processed."
@@ -1462,11 +1538,13 @@ void BulkOrder()
             order.OrderStatus = "Rejected";
             rejectedCount++;
             try { refundStack.Push(order); } catch { } // push rejected order onto stack
+            AppendNotification(order, "Rejected");
             Console.WriteLine($"Order {order.OrderId} => Rejected (delivery in {minutesUntilDelivery} minutes)");
         }
         else
         {
             order.OrderStatus = "Preparing";
+            AppendNotification(order, "Preparing");
             preparingCount++;
             Console.WriteLine($"Order {order.OrderId} => Preparing (delivery at {order.DeliveryDateTime:HH:mm})"); //HH:mm is 24 hour, hh:mm is 12 hour
         }
