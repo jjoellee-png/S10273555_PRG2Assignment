@@ -107,10 +107,23 @@ namespace PRG2Assignment
             }
         }
 
-        public override string ToString()
-        {
+        
 
-            return $"Order {OrderId} ({customerName} at {restaurantName}) - Total: ${OrderTotal:0.00} - Status: {OrderStatus}";
-        }
+            public override string ToString()
+            {
+                string customerName = "Unknown Customer";
+                string restaurantName = "Unknown Restaurant";
+
+                // association links
+                if (Customer != null) customerName = Customer.CustomerName;
+                if (Restaurant != null) restaurantName = Restaurant.RestaurantName;
+
+                // Fallback to IDs/emails 
+                if (Customer == null && CustomerEmail != "") customerName = CustomerEmail;
+                if (Restaurant == null && RestaurantId != "") restaurantName = RestaurantId;
+
+                return $"Order {OrderId} ({customerName} at {restaurantName}) - Total: ${OrderTotal:0.00} - Status: {OrderStatus}";
+            }
+    
     }
 }
