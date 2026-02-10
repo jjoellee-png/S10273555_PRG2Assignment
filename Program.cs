@@ -332,11 +332,11 @@ void ListAllOrders()
             }
 
             Console.WriteLine(
-                $"{order.OrderId,-8}{cust.CustomerName,-13}{restaurantName,-16}{order.DeliveryDateTime:dd/MM/yyyy HH:mm,-22}${order.OrderTotal:0.00,-8}{order.OrderStatus,-10}"
+                $"{order.OrderId,-10}{cust.CustomerName,-13}{restaurantName,-18}{order.DeliveryDateTime,-22:dd/MM/yyyy HH:mm}${order.OrderTotal,-8:0.00,}{order.OrderStatus,-10}"
             );
         }
     }
-
+    
     if (orderCount == 0)
     {
         Console.WriteLine("No orders found.");
@@ -718,7 +718,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
 }
 
-// Process order
+//Nur Tiara Nasha - Feature 6
 void ProcessOrder()
 {
     Console.WriteLine("Process Order");
