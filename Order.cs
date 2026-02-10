@@ -78,8 +78,8 @@ namespace PRG2Assignment
             double total = 0.0;
             if (OrderedFoodItems != null)
             {
-                foreach (var it in OrderedFoodItems)
-                    total += it.CalculateSubtotal();
+                foreach (var item in OrderedFoodItems)
+                    total += item.CalculateSubtotal();
             }
             OrderTotal = total;
             return total;
