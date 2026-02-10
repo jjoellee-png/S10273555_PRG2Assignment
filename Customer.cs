@@ -16,10 +16,10 @@ namespace PRG2Assignment
 
         public Customer() { }
 
-        public Customer(string eAdd, string custName)
+        public Customer(string custName, string eAdd)
         {
-            CustomerName = custName;
-            EmailAddress = eAdd;
+            CustomerName = custName.Trim();
+            EmailAddress = eAdd.Trim();
         }
 
         public void AddOrder(Order order)
