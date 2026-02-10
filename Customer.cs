@@ -24,11 +24,14 @@ namespace PRG2Assignment
 
         public void AddOrder(Order order)
         {
+            if (Orders == null) Orders = new List<Order>();
             Orders.Add(order);
+            if (order != null) order.Customer = this;
         }
 
         public bool RemoveOrder(Order order)
         {
+            if (Orders == null) return false;
             return Orders.Remove(order);
         }
 

@@ -20,6 +20,8 @@ namespace PRG2Assignment
         public bool OrderPaid { get; set; }
 
         // Class associations
+        public Customer Customer { get; set; }
+        public Restaurant Restaurant { get; set; }
         public string CustomerEmail { get; set; } = "";
         public string RestaurantId { get; set; } = "";
 
@@ -73,10 +75,11 @@ namespace PRG2Assignment
         // Calculate total based on OrderedFoodItems
         public double CalculateOrderTotal()
         {
-            double total = 0;
-            foreach (var item in OrderedFoodItems)
+            double total = 0.0;
+            if (OrderedFoodItems != null)
             {
-                total += item.CalculateSubtotal();
+                foreach (var it in OrderedFoodItems)
+                    total += it.CalculateSubtotal();
             }
             OrderTotal = total;
             return total;
@@ -84,11 +87,13 @@ namespace PRG2Assignment
 
         public void AddOrderedFoodItem(OrderedFoodItem item)
         {
+            if (OrderedFoodItems == null) OrderedFoodItems = new List<OrderedFoodItem>();
             OrderedFoodItems.Add(item);
         }
 
         public bool RemoveOrderedFoodItem(OrderedFoodItem item)
         {
+            if (OrderedFoodItems == null) return false;
             return OrderedFoodItems.Remove(item);
         }
 

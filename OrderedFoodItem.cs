@@ -30,7 +30,7 @@ namespace PRG2Assignment
 
         public override string ToString()
         {
-            return base.ToString() + " x " + QtyOrdered + " = $" + SubTotal.ToString("0.00");
+            return $"{ItemName} x {QtyOrdered} = ${SubTotal:0.00}";
         }
     }
 }
