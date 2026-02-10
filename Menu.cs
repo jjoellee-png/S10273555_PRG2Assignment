@@ -17,7 +17,12 @@ namespace S10273555_PRG2Assignment
         private string menuName;
         public string MenuName { get; private set; }
 
-        private List<FoodItem> foodItemList;
+        private List<FoodItem> foodItemList = new List<FoodItem>();
+
+        public List<FoodItem> GetFoodItems()
+        {
+            return new List<FoodItem>(foodItemList);
+        }
 
         public Menu(string menuId, string menuName)
         {

@@ -20,8 +20,8 @@ LoadOrders();
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurants.Count} restaurants loaded!");  // - Tiara
 Console.WriteLine($"{fooditem.Count} food items loaded!"); // - Tiara
-Console.WriteLine($"{customersList.Count} restaurants loaded!");  // - Joelle
-Console.WriteLine($"{ordersList.Count} food items loaded!"); // - Joelle
+Console.WriteLine($"{customersList.Count} customers loaded!");  // - Joelle
+Console.WriteLine($"{ordersList.Count} orders loaded!"); // - Joelle
 
 while (true)
 {
@@ -67,9 +67,6 @@ while (true)
     {
         DeleteOrder();
     }
-
-
-    else if (input == "9")
 
     else if (input == "7")
 
@@ -167,8 +164,8 @@ void LoadCustomers()
         while ((line = sr.ReadLine()) != null)
         {
             string[] parts = line.Split(',');
-            string name = parts[0];
-            string email = parts[1];
+            string name = parts[0].Trim();
+            string email = parts[1].Trim();
 
             Customer customer = new Customer(name, email);
             customersList.Add(customer);
@@ -192,21 +189,31 @@ void LoadOrders()
             int orderId = Convert.ToInt32(parts[0]);
             string custEmail = parts[1];
             string restaurantId = parts[2];
-
-            string deliveryDate = parts[3];
-            string deliveryTime = parts[4];
             string deliveryAddress = parts[5];
+            string dateTimeStr = parts[3].Trim() + " " + parts[4].Trim();
 
-            var createdDateTimeString = parts[6].Split(" ");
-            string createdDateString = createdDateTimeString[0];
-            string createdTimeString = createdDateTimeString[1];
+            DateTime deliveryDateTime;
+            string[] formats = { "dd/MM/yyyy HH:mm", "dd/MM/yyyy" };
+
+            if (!DateTime.TryParseExact(
+                    dateTimeStr,
+                    formats,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out deliveryDateTime))
+            {
+                Console.WriteLine("Invalid delivery date format in order file.");
+                return;
+            }
+
+            DateTime createdDateTime = DateTime.ParseExact(
+                parts[6].Trim(),
+                "dd/MM/yyyy HH:mm",
+                CultureInfo.InvariantCulture
+            );
 
             double totalAmount = Convert.ToDouble(parts[7]);
             string status = parts[8];
-
-            // CultureInfo.InvariantCulture helps to avoid confusion with different formats.
-            DateTime deliveryDateTime = DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-            DateTime createdDateTime = DateTime.ParseExact(createdDateString + " " + createdTimeString, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
 
             Order order = new Order(orderId);
             order.DeliveryDateTime = deliveryDateTime;
@@ -215,14 +222,14 @@ void LoadOrders()
             order.OrderTotal = totalAmount;
             order.OrderStatus = status;
 
-            // here - added foreach and addorderedfooditem
+            // added foreach and addorderedfooditem
             var items = firstParts[1].Split("|");
 
             foreach (string item in items)
             {
-                string[] itemsPart = item.Split(","); // changed items[0] to item so that item wont repeat -Mahima
+                string[] itemsPart = item.Split(","); // changed items[0] to item so that item wont repeat
                 string itemName = itemsPart[0].Trim();
-                int qty = Convert.ToInt32(itemsPart[1].Trim()); //added trim()
+                int qty = Convert.ToInt32(itemsPart[1].Trim());
 
                 foreach (var foodItem in fooditem)
                 {
@@ -261,30 +268,43 @@ void ListRestaurantAndMenuItems()
 {
     Console.WriteLine("All Restaurants and Menu Items");
     Console.WriteLine("==============================");
-    if (restaurants.Count == 0)
+
+    if (restaurants == null || restaurants.Count == 0)
     {
         Console.WriteLine("No restaurants available.");
+        return;
     }
-    else
+
+    foreach (Restaurant r in restaurants)
     {
-        foreach (Restaurant r in restaurants)
+        Console.WriteLine($"Restaurant: {r.RestaurantName} ({r.RestaurantId})");
+
+        if (r.Menus == null || r.Menus.Count == 0)
         {
-            Console.WriteLine($"Restaurant: {r.RestaurantName} ({r.RestaurantId})");
-            if (fooditem == null || fooditem.Count == 0)
-            {
-                Console.WriteLine(" - No food items available.");
-            }
-            else
-            {
-                foreach (FoodItem fi in fooditem)
-                {
-                    Console.WriteLine($" - {fi.ItemName} : {fi.ItemDesc} - ${fi.ItemPrice:F2}");
-                }
-            }
-            Console.WriteLine();
+            Console.WriteLine(" - No food items available.");
         }
+        else
+        {
+            foreach (Menu m in r.Menus)
+            {
+                // Check menu name/id
+                bool hasMenuName = (m.MenuName != null && m.MenuName.Trim() != "");
+                bool hasMenuId = (m.MenuId != null && m.MenuId.Trim() != "");
+
+                if (hasMenuName || hasMenuId)
+                {
+                    Console.WriteLine($" Menu: {m.MenuName} ({m.MenuId})");
+                }
+
+                // Use the public method to display items
+                m.DisplayFoodItems();
+            }
+        }
+
+        Console.WriteLine();
     }
 }
+
 // Nur Tiara Nasha - Feature 4
 void ListAllOrders()
 {
@@ -323,10 +343,6 @@ void ListAllOrders()
     }
 }
 
-
-
-
-
 // Joelle Heng - Feature 5
 void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
 {
@@ -359,7 +375,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     DateTime deliveryDate;
     while (true)
     {
-        Console.WriteLine("Enter Delivery Date (dd/mm/yyyy): ");
+        Console.Write("Enter Delivery Date (dd/mm/yyyy): ");
         string dd = Console.ReadLine();
 
         if (dd == null) dd = "";
@@ -445,6 +461,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
 
     // find customer object
     Customer cust = null;
+    custEmail = (custEmail ?? "").Trim();
     foreach (Customer c in customers)
     {
         if (c.EmailAddress.ToLower() == custEmail.ToLower())
@@ -481,10 +498,23 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         return;
     }
 
-    Console.WriteLine("Available Food Items: ");
+    if (rest.Menus != null && rest.Menus.Count > 0)
+    {
+       
+        fooditem = rest.Menus[0].GetFoodItems(); 
+    }
+
+    if (fooditem == null || fooditem.Count == 0)
+    {
+        Console.WriteLine("No food items for this restaurant.");
+        return;
+    }
+
+    Console.WriteLine("");
+    Console.WriteLine("Available Food Items:");
     for (int i = 0; i < fooditem.Count; i++)
     {
-        Console.WriteLine($"{i + 1}.{fooditem[i].ItemName} - ${fooditem[i].ItemPrice:F2}");
+        Console.WriteLine($"{i + 1}. {fooditem[i].ItemName} - ${fooditem[i].ItemPrice:F2}");
     }
 
     List<OrderedFoodItem> newOrderItems = new List<OrderedFoodItem>();
@@ -578,9 +608,8 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
 
     double deliveryFee = 5.00;
     double total = itemsTotal + deliveryFee;
-
+    Console.WriteLine();
     Console.WriteLine($"Order Total: ${itemsTotal:0.00} + ${deliveryFee:0.00} (delivery) = ${total:0.00}");
-
     Console.Write("Proceed to payment? [Y/N]: ");
     string payChoice = Console.ReadLine() ?? "";
     payChoice = payChoice.Trim().ToUpper();
@@ -593,6 +622,7 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
     string paymentMethod = "";
     while (true)
     {
+        Console.WriteLine();
         Console.WriteLine("Payment method:");
         Console.Write("[CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
         paymentMethod = Console.ReadLine() ?? "";
@@ -628,8 +658,9 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
 
     rest.Orders.Enqueue(newOrder);
     cust.AddOrder(newOrder);
+    ordersList.Add(newOrder);
 
-    // build csv items part
+    // build csv items part (name,qty|name,qty)
     string itemsPart = "";
     for (int i = 0; i < newOrderItems.Count; i++)
     {
@@ -637,7 +668,14 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         if (i < newOrderItems.Count - 1) itemsPart += "|";
     }
 
-    // escape address/request
+    // escape any double-quotes inside itemsPart and wrap in quotes so LoadOrders() can parse it
+    if (itemsPart.Contains("\""))
+    {
+        itemsPart = itemsPart.Replace("\"", "\"\"");
+    }
+    itemsPart = "\"" + itemsPart + "\"";
+
+    // escape/quote address and special request
     string safeAddress = deliveryAddress;
     if (safeAddress.Contains(",") || safeAddress.Contains("\""))
     {
@@ -651,6 +689,11 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         safeRequest = safeRequest.Replace("\"", "\"\"");
         safeRequest = "\"" + safeRequest + "\"";
     }
+
+    // set fields used elsewhere
+    newOrder.CustomerEmail = cust.EmailAddress;
+    newOrder.RestaurantId = rest.RestaurantId;
+    newOrder.OrderDateTime = DateTime.Now;
 
     string line =
         newOrderId + "," +
@@ -666,11 +709,12 @@ void CreateNewOrder(List<Customer> customers, List<Restaurant> restaurants)
         safeRequest + "," +
         itemsPart;
 
-    using (StreamWriter sw = new StreamWriter("orders.csv", true))
+    using (StreamWriter sw = new StreamWriter("orders - Copy.csv", true))
     {
-        sw.WriteLine(line);
+        sw.WriteLine("");
     }
 
+    Console.WriteLine();
     Console.WriteLine($"Order {newOrderId} created successfully! Status: Pending");
 }
 
@@ -945,7 +989,7 @@ void ModifyOrder()
     Console.WriteLine(order.DeliveryAddress);
     Console.WriteLine("Delivery Date/Time:");
     Console.WriteLine(order.DeliveryDateTime.ToString("d/M/yyyy, HH:mm"));
-
+    Console.WriteLine();
     Console.Write("Modify: [1] Items [2] Address [3] Delivery Time: ");
     string choice = (Console.ReadLine() ?? "").Trim();
 
@@ -1193,6 +1237,9 @@ void ModifyOrder()
             {
                 DateTime date = order.DeliveryDateTime.Date;
                 order.DeliveryDateTime = new DateTime(date.Year, date.Month, date.Day, hh, mm, 0);
+                Console.WriteLine();
+                Console.WriteLine($"Order {order.OrderId} updated. New Delivery Time: {order.DeliveryDateTime:HH:mm}");
+                return; 
             }
             else
             {
@@ -1261,20 +1308,6 @@ void ModifyOrder()
 
     // apply new total
     order.OrderTotal = newTotal;
-
-    // display updated order
-    Console.WriteLine("Order " + order.OrderId + " updated.");
-    Console.WriteLine("Updated items:");
-    for (int i = 0; i < order.OrderedFoodItems.Count; i++)
-    {
-        OrderedFoodItem it = order.OrderedFoodItems[i];
-        Console.WriteLine((i + 1) + ". " + it.ItemName + " - " + it.QtyOrdered + " = $" + it.CalculateSubtotal().ToString("0.00"));
-    }
-    Console.WriteLine("Address:");
-    Console.WriteLine(order.DeliveryAddress);
-    Console.WriteLine("Delivery Date/Time:");
-    Console.WriteLine(order.DeliveryDateTime.ToString("d/M/yyyy, HH:mm"));
-    Console.WriteLine("Order Total: $" + order.OrderTotal.ToString("0.00"));
 }
 
 //Nur Tiara Nasha - Feature 8
