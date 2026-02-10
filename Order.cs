@@ -20,8 +20,8 @@ namespace PRG2Assignment
         public bool OrderPaid { get; set; }
 
         // Class associations
-        public Customer Customer { get; set; }  // links to the customer
-        public Restaurant Restaurant { get; set; }  // links to the restaurant
+        public string CustomerEmail { get; set; } = "";
+        public string RestaurantId { get; set; } = "";
 
         public List<OrderedFoodItem> OrderedFoodItems { get; set; }
 
@@ -38,37 +38,39 @@ namespace PRG2Assignment
         // Constructor with full info (without order total)
         public Order(int orderId, DateTime orderDateTime, string status,
                      string deliveryAddress, string paymentMethod,
-                     Customer customer = null, Restaurant restaurant = null)
+                     string customerEmail, string restaurantId)
         {
             OrderId = orderId;
             OrderDateTime = orderDateTime;
             OrderStatus = status;
             DeliveryAddress = deliveryAddress;
             OrderPaymentMethod = paymentMethod;
+            CustomerEmail = customerEmail;
+            RestaurantId = restaurantId;
             OrderPaid = false;
             OrderedFoodItems = new List<OrderedFoodItem>();
-            Customer = customer;
-            Restaurant = restaurant;
+            
         }
 
         // Constructor including order total
         public Order(int orderId, DateTime orderDateTime, string status,
                      string deliveryAddress, string paymentMethod, double orderTotal,
-                     Customer customer = null, Restaurant restaurant = null)
+                     string customerEmail, string restaurantId)
         {
             OrderId = orderId;
             OrderDateTime = orderDateTime;
             OrderStatus = status;
             DeliveryAddress = deliveryAddress;
             OrderPaymentMethod = paymentMethod;
+            CustomerEmail = customerEmail;
+            RestaurantId = restaurantId;
             OrderPaid = false;
             OrderedFoodItems = new List<OrderedFoodItem>();
             OrderTotal = orderTotal;
-            Customer = customer;
-            Restaurant = restaurant;
+            
         }
 
-        // Calculate total dynamically based on OrderedFoodItems
+        // Calculate total based on OrderedFoodItems
         public double CalculateOrderTotal()
         {
             double total = 0;
@@ -102,8 +104,6 @@ namespace PRG2Assignment
 
         public override string ToString()
         {
-            string customerName = Customer != null ? Customer.CustomerName : "Unknown Customer";
-            string restaurantName = Restaurant != null ? Restaurant.RestaurantName : "Unknown Restaurant";
 
             return $"Order {OrderId} ({customerName} at {restaurantName}) - Total: ${OrderTotal:0.00} - Status: {OrderStatus}";
         }
